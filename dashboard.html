@@ -1139,14 +1139,27 @@
       document.getElementById("stat-depth-val").textContent = data.tacticalDepth || "65.0 m";
       document.getElementById("stat-lineup-val").textContent = data.activeLineup || "11 players";
 
-      // Update Passing Network Buttons
+      // Update Passing Network Buttons & Image
       const btnA = document.getElementById("btn-pass-a");
       const btnB = document.getElementById("btn-pass-b");
+      const passImgEl = document.getElementById("pass-img");
       btnA.textContent = data.teamA;
       btnB.textContent = data.teamB;
-      btnA.classList.remove("active");
-      btnB.classList.add("active"); // default to active passing team
-      document.getElementById("pass-img").src = data.passImages.teamB;
+
+      const imgA = (data.passImages && (data.passImages.teamA || data.passImages.team_a)) || "";
+      const imgB = (data.passImages && (data.passImages.teamB || data.passImages.team_b)) || "";
+
+      // Default to the team that held higher possession / pass activity
+      const posAVal = parseFloat(data.posA) || 0;
+      if (posAVal >= 50.0 && imgA) {
+        btnA.classList.add("active");
+        btnB.classList.remove("active");
+        passImgEl.src = imgA;
+      } else {
+        btnA.classList.remove("active");
+        btnB.classList.add("active");
+        passImgEl.src = imgB || imgA;
+      }
 
       // Render Leaderboard
       renderLeaderboard(data.leaderboard);
@@ -1164,7 +1177,7 @@
       document.getElementById(`btn-tab-${type}`).classList.add("active");
 
       const match = matchData[currentMatch];
-      if (match && match.videos[type]) {
+      if (match && match.videos && match.videos[type]) {
         source.src = match.videos[type];
         player.load();
         player.play().catch(e => console.log("Autoplay notice:", e));
@@ -1173,16 +1186,20 @@
 
     function switchPass(teamKey) {
       const match = matchData[currentMatch];
+      if (!match || !match.passImages) return;
       const img = document.getElementById("pass-img");
       const btnA = document.getElementById("btn-pass-a");
       const btnB = document.getElementById("btn-pass-b");
 
-      if (teamKey === "Team A") {
-        img.src = match.passImages.teamA;
+      const imgA = match.passImages.teamA || match.passImages.team_a || "";
+      const imgB = match.passImages.teamB || match.passImages.team_b || "";
+
+      if (teamKey === "Team A" || teamKey === match.teamA) {
+        if (imgA) img.src = imgA;
         btnA.classList.add("active");
         btnB.classList.remove("active");
       } else {
-        img.src = match.passImages.teamB;
+        if (imgB) img.src = imgB;
         btnB.classList.add("active");
         btnA.classList.remove("active");
       }
@@ -1278,9 +1295,17 @@
             const bar = document.getElementById("match-selector-bar");
             list.forEach(m => {
               const key = m.id.includes("gladbach") ? "gladbach" : (m.id.includes("stuttgart") ? "stuttgart" : m.id);
+              const passImgs = m.pass_images || {};
+              const normalizedPass = {
+                teamA: passImgs.team_a || passImgs.teamA || "",
+                teamB: passImgs.team_b || passImgs.teamB || "",
+                team_a: passImgs.team_a || passImgs.teamA || "",
+                team_b: passImgs.team_b || passImgs.teamB || ""
+              };
+
               if (matchData[key]) {
                 matchData[key].videos = m.videos;
-                matchData[key].passImages = m.pass_images;
+                matchData[key].passImages = normalizedPass;
                 if (m.possession) {
                   matchData[key].posA = `${m.possession[m.team_a] || 0}%`;
                   matchData[key].posB = `${m.possession[m.team_b] || 0}%`;
@@ -1310,7 +1335,7 @@
                   tacticalDepth: `${m.tactical_metrics && m.tactical_metrics[m.team_a] ? m.tactical_metrics[m.team_a].team_depth_m : 65} m`,
                   activeLineup: "11 players",
                   videos: m.videos,
-                  passImages: m.pass_images,
+                  passImages: normalizedPass,
                   leaderboard: matchData.stuttgart.leaderboard
                 };
 
