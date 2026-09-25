@@ -1267,8 +1267,11 @@
 
     async function loadDynamicMatches() {
       try {
-        const res = await fetch("/api/matches");
-        if (res.ok) {
+        let res = await fetch("/api/matches");
+        if (!res || !res.ok) {
+          res = await fetch("matches.json");
+        }
+        if (res && res.ok) {
           const list = await res.json();
           if (Array.isArray(list) && list.length > 0) {
             const bar = document.getElementById("match-selector-bar");
