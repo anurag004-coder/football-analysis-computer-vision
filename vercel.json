@@ -9,6 +9,14 @@
       "destination": "/dashboard.html"
     },
     {
+      "source": "/dashboard",
+      "destination": "/dashboard.html"
+    },
+    {
+      "source": "/dashboard/outputs/(.*)",
+      "destination": "/outputs/$1"
+    },
+    {
       "source": "/api/matches",
       "destination": "/matches.json"
     }

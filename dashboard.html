@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tactical Vision AI · Bundesliga Match Analytics</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -864,8 +865,8 @@
       </div>
 
       <div class="video-wrapper">
-        <video id="main-video-player" controls autoplay loop playsinline>
-          <source id="video-source" src="outputs/stuttgart_vs_furth/sample_match_combined_web.mp4" type="video/mp4">
+        <video id="main-video-player" controls autoplay muted loop playsinline preload="auto">
+          <source id="video-source" src="outputs/vfb_stuttgart_vs_greuther_furth/sample_match_combined_web.mp4" type="video/mp4">
           Your browser does not support HTML5 video.
         </video>
       </div>
@@ -918,7 +919,7 @@
           Nodes indicate player average pitch coordinates (m). Directed arrow lines represent completed passing links.
         </p>
         <div class="passing-image-container">
-          <img id="pass-img" src="outputs/stuttgart_vs_furth/sample_match_passing_network_greuther_furth.png" alt="Team Passing Network">
+          <img id="pass-img" src="outputs/vfb_stuttgart_vs_greuther_furth/sample_match_passing_network_greuther_furth.png" alt="Team Passing Network">
         </div>
       </div>
 
@@ -1025,13 +1026,13 @@
         tacticalDepth: "70.7 m",
         activeLineup: "11 players",
         videos: {
-          combined: "outputs/stuttgart_vs_furth/sample_match_combined_web.mp4",
-          annotated: "outputs/stuttgart_vs_furth/sample_match_annotated_web.mp4",
-          tactical: "outputs/stuttgart_vs_furth/sample_match_tactical_map_web.mp4"
+          combined: "outputs/vfb_stuttgart_vs_greuther_furth/sample_match_combined_web.mp4",
+          annotated: "outputs/vfb_stuttgart_vs_greuther_furth/sample_match_annotated_web.mp4",
+          tactical: "outputs/vfb_stuttgart_vs_greuther_furth/sample_match_tactical_map_web.mp4"
         },
         passImages: {
-          teamA: "outputs/stuttgart_vs_furth/sample_match_passing_network_vfb_stuttgart.png",
-          teamB: "outputs/stuttgart_vs_furth/sample_match_passing_network_greuther_furth.png"
+          teamA: "outputs/vfb_stuttgart_vs_greuther_furth/sample_match_passing_network_vfb_stuttgart.png",
+          teamB: "outputs/vfb_stuttgart_vs_greuther_furth/sample_match_passing_network_greuther_furth.png"
         },
         leaderboard: [
           { id: "#4", team: "VfB Stuttgart", badgeClass: "red", dist: "63.39 m", avg: "22.3 km/h", top: "38.0 km/h", pct: 100 },
@@ -1055,20 +1056,20 @@
         subSpeed: "Player #11 · VfL Wolfsburg",
         teamA: "Borussia Mgladbach",
         teamB: "VfL Wolfsburg",
-        posA: "50.0%",
-        posB: "50.0%",
-        passesCompleted: "12 passes",
-        tacticalWidth: "58.2 m",
-        tacticalDepth: "64.5 m",
+        posA: "90.3%",
+        posB: "9.7%",
+        passesCompleted: "8 passes",
+        tacticalWidth: "79.0 m",
+        tacticalDepth: "82.8 m",
         activeLineup: "11 players",
         videos: {
-          combined: "outputs/gladbach_vs_wolfsburg/gladbach_vs_wolfsburg_extended_combined_web.mp4",
-          annotated: "outputs/gladbach_vs_wolfsburg/gladbach_vs_wolfsburg_extended_annotated_web.mp4",
-          tactical: "outputs/gladbach_vs_wolfsburg/gladbach_vs_wolfsburg_extended_tactical_map_web.mp4"
+          combined: "outputs/borussia_mgladbach_vs_vfl_wolfsburg/gladbach_vs_wolfsburg_extended_combined_web.mp4",
+          annotated: "outputs/borussia_mgladbach_vs_vfl_wolfsburg/gladbach_vs_wolfsburg_extended_annotated_web.mp4",
+          tactical: "outputs/borussia_mgladbach_vs_vfl_wolfsburg/gladbach_vs_wolfsburg_extended_tactical_map_web.mp4"
         },
         passImages: {
-          teamA: "outputs/gladbach_vs_wolfsburg/gladbach_vs_wolfsburg_extended_passing_network_borussia_mgladbach.png",
-          teamB: "outputs/gladbach_vs_wolfsburg/gladbach_vs_wolfsburg_extended_passing_network_vfl_wolfsburg.png"
+          teamA: "outputs/borussia_mgladbach_vs_vfl_wolfsburg/gladbach_vs_wolfsburg_extended_passing_network_borussia_mgladbach.png",
+          teamB: "outputs/borussia_mgladbach_vs_vfl_wolfsburg/gladbach_vs_wolfsburg_extended_passing_network_vfl_wolfsburg.png"
         },
         leaderboard: [
           { id: "#11", team: "VfL Wolfsburg", badgeClass: "neon-green", dist: "69.16 m", avg: "16.9 km/h", top: "38.0 km/h", pct: 100 },
@@ -1277,7 +1278,21 @@
             const bar = document.getElementById("match-selector-bar");
             list.forEach(m => {
               const key = m.id.includes("gladbach") ? "gladbach" : (m.id.includes("stuttgart") ? "stuttgart" : m.id);
-              if (!matchData[key]) {
+              if (matchData[key]) {
+                matchData[key].videos = m.videos;
+                matchData[key].passImages = m.pass_images;
+                if (m.possession) {
+                  matchData[key].posA = `${m.possession[m.team_a] || 0}%`;
+                  matchData[key].posB = `${m.possession[m.team_b] || 0}%`;
+                }
+                if (m.total_passes) {
+                  matchData[key].passesCompleted = `${m.total_passes} passes`;
+                }
+                if (m.tactical_metrics && m.tactical_metrics[m.team_a]) {
+                  matchData[key].tacticalWidth = `${m.tactical_metrics[m.team_a].team_width_m} m`;
+                  matchData[key].tacticalDepth = `${m.tactical_metrics[m.team_a].team_depth_m} m`;
+                }
+              } else {
                 matchData[key] = {
                   title: `🎬 ${m.name} · Tactical Footage`,
                   tracks: String(m.total_tracks || 80),
@@ -1313,6 +1328,8 @@
                 bar.appendChild(btn);
               }
             });
+            // Re-render to refresh video and pass images with synced paths
+            selectMatch(currentMatch);
           }
         }
       } catch (e) {
