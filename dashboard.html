@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tactical Vision AI · Bundesliga Match Analytics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0a0e14;
+      --bg-card: rgba(18, 24, 38, 0.75);
+      --bg-card-hover: rgba(26, 35, 54, 0.85);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(0, 229, 255, 0.35);
+      --accent-cyan: #00e5ff;
+      --accent-green: #00e676;
+      --accent-red: #ff3366;
+      --accent-blue: #2979ff;
+      --accent-neon-green: #44ff22;
+      --text-main: #f0f4f8;
+      --text-muted: #94a3b8;
+      --font-sans: 'Outfit', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: radial-gradient(circle at 15% 15%, #0f172a 0%, #06090e 100%);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+      line-height: 1.5;
+    }
+
+    .glow-sphere-1 {
+      position: fixed;
+      top: -150px;
+      left: 10%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(0, 229, 255, 0.12) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .glow-sphere-2 {
+      position: fixed;
+      bottom: -150px;
+      right: 5%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(255, 51, 102, 0.08) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 32px 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .brand-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 0 25px rgba(0, 229, 255, 0.35);
+    }
+
+    .brand-title h1 {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(to right, #ffffff, #b0c4de);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-title p {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .badge-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+    }
+
+    .badge.gpu {
+      color: #76b900;
+      border-color: rgba(118, 185, 0, 0.3);
+      background: rgba(118, 185, 0, 0.08);
+    }
+    .badge.live {
+      color: var(--accent-cyan);
+      border-color: rgba(0, 229, 255, 0.3);
+      background: rgba(0, 229, 255, 0.08);
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 8px currentColor;
+      animation: pulse 2s infinite;
+    }
+
+    .btn-analyze-new {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+      color: #06090e;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 15px rgba(0, 229, 255, 0.3);
+      transition: all 0.2s ease;
+      font-family: var(--font-sans);
+    }
+    .btn-analyze-new:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 229, 255, 0.5);
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    /* Match Selector Bar */
+    .match-selector-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .match-select-btn {
+      flex: 1;
+      min-width: 280px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 14px 18px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .match-select-btn:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .match-select-btn.active {
+      background: linear-gradient(135deg, rgba(0, 229, 255, 0.12), rgba(41, 121, 255, 0.12));
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.2);
+    }
+
+    .match-icon {
+      font-size: 24px;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .match-info h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+
+    .match-info p {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    /* KPI Summary Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 18px;
+      padding: 20px;
+      backdrop-filter: blur(15px);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(to right, transparent, var(--border-glow), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .kpi-card:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    .kpi-card:hover::before {
+      opacity: 1;
+    }
+
+    .kpi-title {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .kpi-value {
+      font-size: 32px;
+      font-weight: 800;
+      color: #fff;
+      font-family: var(--font-sans);
+      letter-spacing: -1px;
+    }
+
+    .kpi-sub {
+      font-size: 12px;
+      color: var(--accent-cyan);
+      margin-top: 4px;
+      font-family: var(--font-mono);
+    }
+
+    /* Video Player Section */
+    .video-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      padding: 24px;
+      backdrop-filter: blur(20px);
+      margin-bottom: 32px;
+    }
+
+    .video-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .video-title {
+      font-size: 20px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .video-tabs {
+      display: flex;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 4px;
+      border-radius: 12px;
+      gap: 4px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .video-tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: var(--font-sans);
+    }
+
+    .video-tab-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .video-tab-btn.active {
+      background: var(--accent-cyan);
+      color: #06090e;
+      font-weight: 700;
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
+    }
+
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+      background: #000;
+    }
+
+    video {
+      width: 100%;
+      display: block;
+      border-radius: 16px;
+    }
+
+    /* Tactical Grid: Passing Networks & Physical Leaderboard */
+    .tactical-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    @media (max-width: 1024px) {
+      .tactical-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 24px;
+      backdrop-filter: blur(15px);
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* Possession & Tactical Matrix */
+    .possession-box {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .possession-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .pos-team-txt.team-a {
+      color: #ff5252;
+    }
+    .pos-team-txt.team-b {
+      color: #44ff22;
+    }
+    .pos-mid-title {
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+      font-family: var(--font-mono);
+    }
+
+    .pos-bar-container {
+      height: 12px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+      display: flex;
+      margin-bottom: 14px;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    .pos-bar-fill {
+      height: 100%;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .pos-bar-fill.team-a {
+      background: linear-gradient(90deg, #ff3366, #ff6b81);
+    }
+    .pos-bar-fill.team-b {
+      background: linear-gradient(90deg, #00e676, #00e5ff);
+    }
+
+    .tactical-metrics-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .tactical-kpi {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 8px 10px;
+      text-align: center;
+    }
+
+    .tactical-kpi .label {
+      display: block;
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-family: var(--font-mono);
+      margin-bottom: 2px;
+    }
+
+    .tactical-kpi .val {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      font-family: var(--font-sans);
+    }
+
+    /* Passing Networks Tabs & Image */
+    .passing-tabs {
+      display: flex;
+      gap: 8px;
+    }
+
+    .pass-tab-btn {
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .pass-tab-btn.active {
+      background: var(--accent-red);
+      color: #fff;
+      border-color: transparent;
+      box-shadow: 0 0 10px rgba(255, 51, 102, 0.4);
+    }
+    .pass-tab-btn.team-b.active {
+      background: var(--accent-blue);
+      box-shadow: 0 0 10px rgba(41, 121, 255, 0.4);
+    }
+
+    .passing-image-container {
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--border-subtle);
+      background: #0b1017;
+      text-align: center;
+    }
+
+    .passing-image-container img {
+      width: 100%;
+      height: auto;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+
+    .passing-image-container img:hover {
+      transform: scale(1.015);
+    }
+
+    /* Table */
+    .table-container {
+      overflow-x: auto;
+      max-height: 480px;
+      overflow-y: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th {
+      background: rgba(0, 0, 0, 0.4);
+      color: var(--text-muted);
+      text-align: left;
+      padding: 12px 14px;
+      position: sticky;
+      top: 0;
+      font-weight: 600;
+      border-bottom: 1px solid var(--border-subtle);
+      font-family: var(--font-mono);
+    }
+
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: #e2e8f0;
+      font-family: var(--font-sans);
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .team-badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: var(--font-mono);
+    }
+    .team-badge.red {
+      background: rgba(220, 20, 60, 0.2);
+      color: #ff6b81;
+      border: 1px solid rgba(220, 20, 60, 0.4);
+    }
+    .team-badge.white {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+    }
+    .team-badge.neon-green {
+      background: rgba(68, 255, 34, 0.15);
+      color: #44ff22;
+      border: 1px solid rgba(68, 255, 34, 0.35);
+    }
+
+    .speed-bar-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .speed-bar {
+      flex: 1;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+      min-width: 60px;
+    }
+    .speed-fill {
+      height: 100%;
+      background: linear-gradient(to right, var(--accent-cyan), var(--accent-green));
+      border-radius: 3px;
+    }
+
+    /* Modal for Analyzing New Clips */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background: #0d121c;
+      border: 1px solid var(--border-glow);
+      border-radius: 24px;
+      width: 100%;
+      max-width: 620px;
+      padding: 32px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+      animation: modalSlide 0.3s ease;
+    }
+
+    @keyframes modalSlide {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .modal-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 28px;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .form-group input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: #fff;
+      font-family: var(--font-sans);
+      font-size: 14px;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 12px;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .btn-cancel {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-muted);
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-submit {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+      color: #06090e;
+      border: none;
+      padding: 10px 22px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 229, 255, 0.3);
+    }
+
+    .status-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent-cyan);
+      font-size: 13px;
+      font-family: var(--font-mono);
+      margin-bottom: 8px;
+    }
+    .status-pulse {
+      width: 8px;
+      height: 8px;
+      background: var(--accent-cyan);
+      border-radius: 50%;
+      animation: pulse 1s infinite;
+    }
+    #analyze-terminal-log {
+      background: #05070a;
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 12px;
+      max-height: 140px;
+      overflow-y: auto;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    footer {
+      text-align: center;
+      padding: 40px 0 20px;
+      font-size: 13px;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-subtle);
+      margin-top: 40px;
+    }
+  </style>
+</head>
+<body>
+  <div class="glow-sphere-1"></div>
+  <div class="glow-sphere-2"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <div class="brand-icon">⚽</div>
+        <div class="brand-title">
+          <h1>Tactical Vision AI · Match Analytics Hub</h1>
+          <p>YOLOv11 · ByteTrack · OpenCV Homography · Voronoi Space Control</p>
+        </div>
+      </div>
+      <div class="badge-bar">
+        <button class="btn-analyze-new" onclick="openAnalyzeModal()">➕ Analyze New Clip</button>
+        <span class="badge gpu"><span class="status-dot"></span> NVIDIA RTX 3050 GPU</span>
+        <span class="badge live" id="badge-fps">1080p Full HD @ 25 FPS</span>
+        <span class="badge" id="badge-stability">ID Stability: 100% (0.0% switch)</span>
+      </div>
+    </header>
+
+    <!-- Match Selector Bar -->
+    <div class="match-selector-bar" id="match-selector-bar">
+      <!-- Injected by JavaScript -->
+      <button class="match-select-btn active" id="btn-match-stuttgart" onclick="selectMatch('stuttgart')">
+        <div class="match-icon">🔴</div>
+        <div class="match-info">
+          <h3>VfB Stuttgart vs. Greuther Fürth</h3>
+          <p>Mercedes-Benz Arena · 500 Frames (20.0s)</p>
+        </div>
+      </button>
+
+      <button class="match-select-btn" id="btn-match-gladbach" onclick="selectMatch('gladbach')">
+        <div class="match-icon">🟢</div>
+        <div class="match-info">
+          <h3>Borussia Mönchengladbach vs. VfL Wolfsburg</h3>
+          <p>Borussia-Park · 500 Frames (20.0s)</p>
+        </div>
+      </button>
+    </div>
+
+    <!-- KPI Summary Grid -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-title">Players Tracked <span id="kpi-icon-tracks">👥</span></div>
+        <div class="kpi-value" id="val-tracks">188</div>
+        <div class="kpi-sub" id="sub-tracks">ByteTrack Stability: 100%</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Pitch Space Control <span id="kpi-icon-control">📐</span></div>
+        <div class="kpi-value" id="val-control">82.8%</div>
+        <div class="kpi-sub" id="sub-control">Greuther Fürth Dominance (Voronoi)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Top Match Speed <span id="kpi-icon-speed">⚡</span></div>
+        <div class="kpi-value" id="val-speed">38.0 <span style="font-size: 18px; font-weight: 500;">km/h</span></div>
+        <div class="kpi-sub" id="sub-speed">Player #4 · VfB Stuttgart</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-title">Homography Error <span id="kpi-icon-reproj">🎯</span></div>
+        <div class="kpi-value">&lt; 0.1 <span style="font-size: 18px; font-weight: 500;">px</span></div>
+        <div class="kpi-sub">PRD Requirement: &lt; 3.0 px</div>
+      </div>
+    </div>
+
+    <!-- Master Video Showcase -->
+    <div class="video-section">
+      <div class="video-header">
+        <div class="video-title">
+          <span id="video-section-title">🎬 VfB Stuttgart vs. Greuther Fürth · Tactical Footage</span>
+        </div>
+        <div class="video-tabs">
+          <button class="video-tab-btn active" id="btn-tab-combined" onclick="switchVideo('combined')">
+            Combined Side-by-Side View
+          </button>
+          <button class="video-tab-btn" id="btn-tab-annotated" onclick="switchVideo('annotated')">
+            Annotated Broadcast Footage
+          </button>
+          <button class="video-tab-btn" id="btn-tab-tactical" onclick="switchVideo('tactical')">
+            2D Tactical Radar Map
+          </button>
+        </div>
+      </div>
+
+      <div class="video-wrapper">
+        <video id="main-video-player" controls autoplay loop playsinline>
+          <source id="video-source" src="outputs/stuttgart_vs_furth/sample_match_combined_web.mp4" type="video/mp4">
+          Your browser does not support HTML5 video.
+        </video>
+      </div>
+    </div>
+
+    <!-- Tactical Grid: Passing Networks & Physical Leaderboard -->
+    <div class="tactical-grid">
+      <!-- Passing Networks & Possession -->
+      <div class="card">
+        <div class="card-title">
+          <span>Passing Networks & Possession</span>
+          <div class="passing-tabs">
+            <button class="pass-tab-btn active" id="btn-pass-a" onclick="switchPass('Team A')">VfB Stuttgart</button>
+            <button class="pass-tab-btn team-b" id="btn-pass-b" onclick="switchPass('Team B')">Greuther Fürth</button>
+          </div>
+        </div>
+
+        <!-- Live Possession Breakdown Bar -->
+        <div class="possession-box">
+          <div class="possession-header">
+            <span id="pos-team-a-label" class="pos-team-txt team-a">VfB Stuttgart: <strong>0.0%</strong></span>
+            <span class="pos-mid-title">BALL POSSESSION</span>
+            <span id="pos-team-b-label" class="pos-team-txt team-b"><strong>100.0%</strong> :Greuther Fürth</span>
+          </div>
+          <div class="pos-bar-container">
+            <div id="pos-bar-a" class="pos-bar-fill team-a" style="width: 0%;"></div>
+            <div id="pos-bar-b" class="pos-bar-fill team-b" style="width: 100%;"></div>
+          </div>
+          <div class="tactical-metrics-row">
+            <div class="tactical-kpi">
+              <span class="label">Completed Passes</span>
+              <span class="val" id="stat-passes-val">10</span>
+            </div>
+            <div class="tactical-kpi">
+              <span class="label">Tactical Width</span>
+              <span class="val" id="stat-width-val">63.9 m</span>
+            </div>
+            <div class="tactical-kpi">
+              <span class="label">Tactical Depth</span>
+              <span class="val" id="stat-depth-val">70.7 m</span>
+            </div>
+            <div class="tactical-kpi">
+              <span class="label">Active Lineup</span>
+              <span class="val" id="stat-lineup-val">11 players</span>
+            </div>
+          </div>
+        </div>
+
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
+          Nodes indicate player average pitch coordinates (m). Directed arrow lines represent completed passing links.
+        </p>
+        <div class="passing-image-container">
+          <img id="pass-img" src="outputs/stuttgart_vs_furth/sample_match_passing_network_greuther_furth.png" alt="Team Passing Network">
+        </div>
+      </div>
+
+      <!-- Player Leaderboard Table -->
+      <div class="card">
+        <div class="card-title">
+          <span>Player Physical Workload Leaderboard</span>
+          <span style="font-size: 12px; color: var(--accent-cyan); font-family: var(--font-mono);">Ranked by Distance</span>
+        </div>
+        <div class="table-container">
+          <table id="leaderboard-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Team</th>
+                <th>Distance</th>
+                <th>Avg Speed</th>
+                <th>Top Sprint Speed</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-tbody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for Analyzing New MP4 -->
+    <div class="modal-overlay" id="modal-analyze" onclick="handleModalOverlayClick(event)">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h2>🎬 Analyze New Football Match Footage</h2>
+          <button class="modal-close" onclick="closeAnalyzeModal()">&times;</button>
+        </div>
+        <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 20px;">
+          Enter any local MP4 football match video path. The pipeline will detect players, track trajectories, calibrate pitch homography, compute Voronoi dominance, detect passes, and transcode web videos.
+        </p>
+        <form id="form-analyze" onsubmit="submitAnalysis(event)">
+          <div class="form-group">
+            <label>Video File Path (e.g. data/samples/sample_match.mp4):</label>
+            <input type="text" id="input-video-path" placeholder="Path to .mp4 file" required>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Team A Name (Home):</label>
+              <input type="text" id="input-team-a" placeholder="e.g. Arsenal">
+            </div>
+            <div class="form-group">
+              <label>Team A Color:</label>
+              <input type="color" id="input-team-a-col" value="#DC143C" style="height: 42px; padding: 2px;">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Team B Name (Away):</label>
+              <input type="text" id="input-team-b" placeholder="e.g. Chelsea">
+            </div>
+            <div class="form-group">
+              <label>Team B Color:</label>
+              <input type="color" id="input-team-b-col" value="#0055FF" style="height: 42px; padding: 2px;">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Max Frames (leave blank for complete video):</label>
+            <input type="number" id="input-max-frames" placeholder="e.g. 500 (20 seconds @ 25fps)">
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn-cancel" onclick="closeAnalyzeModal()">Cancel</button>
+            <button type="submit" class="btn-submit" id="btn-submit-analyze">⚡ Run Tactical AI Analysis</button>
+          </div>
+        </form>
+        <div id="analyze-status-box" style="display: none; margin-top: 20px;">
+          <div class="status-header">
+            <span class="status-pulse"></span>
+            <span id="analyze-status-text">Starting analysis...</span>
+          </div>
+          <pre id="analyze-terminal-log"></pre>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Tactical Football Computer Vision Pipeline · Engineered with YOLOv11, ByteTrack, OpenCV Homography, Voronoi Space Control & PyAV
+    </footer>
+  </div>
+
+  <script>
+    const matchData = {
+      stuttgart: {
+        title: "🎬 VfB Stuttgart vs. Greuther Fürth · Tactical Footage",
+        tracks: "188",
+        subTracks: "ByteTrack Stability: 100%",
+        control: "82.8%",
+        subControl: "Greuther Fürth Dominance (Voronoi)",
+        speed: "38.0",
+        subSpeed: "Player #4 · VfB Stuttgart",
+        teamA: "VfB Stuttgart",
+        teamB: "Greuther Fürth",
+        posA: "0.0%",
+        posB: "100.0%",
+        passesCompleted: "10 passes",
+        tacticalWidth: "63.9 m",
+        tacticalDepth: "70.7 m",
+        activeLineup: "11 players",
+        videos: {
+          combined: "outputs/stuttgart_vs_furth/sample_match_combined_web.mp4",
+          annotated: "outputs/stuttgart_vs_furth/sample_match_annotated_web.mp4",
+          tactical: "outputs/stuttgart_vs_furth/sample_match_tactical_map_web.mp4"
+        },
+        passImages: {
+          teamA: "outputs/stuttgart_vs_furth/sample_match_passing_network_vfb_stuttgart.png",
+          teamB: "outputs/stuttgart_vs_furth/sample_match_passing_network_greuther_furth.png"
+        },
+        leaderboard: [
+          { id: "#4", team: "VfB Stuttgart", badgeClass: "red", dist: "63.39 m", avg: "22.3 km/h", top: "38.0 km/h", pct: 100 },
+          { id: "#10", team: "Greuther Fürth", badgeClass: "white", dist: "63.87 m", avg: "12.8 km/h", top: "37.6 km/h", pct: 99 },
+          { id: "#90", team: "VfB Stuttgart", badgeClass: "red", dist: "44.82 m", avg: "14.5 km/h", top: "36.3 km/h", pct: 95 },
+          { id: "#86", team: "Greuther Fürth", badgeClass: "white", dist: "33.61 m", avg: "10.6 km/h", top: "29.5 km/h", pct: 78 },
+          { id: "#38", team: "Greuther Fürth", badgeClass: "white", dist: "23.37 m", avg: "8.6 km/h", top: "36.6 km/h", pct: 96 },
+          { id: "#80", team: "VfB Stuttgart", badgeClass: "red", dist: "23.17 m", avg: "12.0 km/h", top: "29.7 km/h", pct: 78 },
+          { id: "#118", team: "VfB Stuttgart", badgeClass: "red", dist: "23.14 m", avg: "14.6 km/h", top: "38.0 km/h", pct: 100 },
+          { id: "#125", team: "Greuther Fürth", badgeClass: "white", dist: "22.96 m", avg: "16.6 km/h", top: "38.0 km/h", pct: 100 },
+          { id: "#3", team: "Greuther Fürth", badgeClass: "white", dist: "19.62 m", avg: "22.3 km/h", top: "38.0 km/h", pct: 100 }
+        ]
+      },
+      gladbach: {
+        title: "🎬 Borussia Mönchengladbach vs. VfL Wolfsburg · Tactical Footage",
+        tracks: "83",
+        subTracks: "ByteTrack Stability: 100%",
+        control: "86.7%",
+        subControl: "Borussia Mönchengladbach Dominance",
+        speed: "38.0",
+        subSpeed: "Player #11 · VfL Wolfsburg",
+        teamA: "Borussia Mgladbach",
+        teamB: "VfL Wolfsburg",
+        posA: "50.0%",
+        posB: "50.0%",
+        passesCompleted: "12 passes",
+        tacticalWidth: "58.2 m",
+        tacticalDepth: "64.5 m",
+        activeLineup: "11 players",
+        videos: {
+          combined: "outputs/gladbach_vs_wolfsburg/gladbach_vs_wolfsburg_extended_combined_web.mp4",
+          annotated: "outputs/gladbach_vs_wolfsburg/gladbach_vs_wolfsburg_extended_annotated_web.mp4",
+          tactical: "outputs/gladbach_vs_wolfsburg/gladbach_vs_wolfsburg_extended_tactical_map_web.mp4"
+        },
+        passImages: {
+          teamA: "outputs/gladbach_vs_wolfsburg/gladbach_vs_wolfsburg_extended_passing_network_borussia_mgladbach.png",
+          teamB: "outputs/gladbach_vs_wolfsburg/gladbach_vs_wolfsburg_extended_passing_network_vfl_wolfsburg.png"
+        },
+        leaderboard: [
+          { id: "#11", team: "VfL Wolfsburg", badgeClass: "neon-green", dist: "69.16 m", avg: "16.9 km/h", top: "38.0 km/h", pct: 100 },
+          { id: "#4", team: "Borussia Mgladbach", badgeClass: "white", dist: "54.28 m", avg: "14.7 km/h", top: "38.0 km/h", pct: 100 },
+          { id: "#13", team: "Borussia Mgladbach", badgeClass: "white", dist: "45.84 m", avg: "13.2 km/h", top: "38.0 km/h", pct: 100 },
+          { id: "#8", team: "Borussia Mgladbach", badgeClass: "white", dist: "35.94 m", avg: "16.7 km/h", top: "38.0 km/h", pct: 100 },
+          { id: "#14", team: "VfL Wolfsburg", badgeClass: "neon-green", dist: "24.10 m", avg: "11.2 km/h", top: "26.0 km/h", pct: 68 },
+          { id: "#12", team: "VfL Wolfsburg", badgeClass: "neon-green", dist: "24.01 m", avg: "13.6 km/h", top: "38.0 km/h", pct: 100 },
+          { id: "#10", team: "Borussia Mgladbach", badgeClass: "white", dist: "22.56 m", avg: "14.2 km/h", top: "38.0 km/h", pct: 100 },
+          { id: "#16", team: "Borussia Mgladbach", badgeClass: "white", dist: "20.16 m", avg: "16.5 km/h", top: "38.0 km/h", pct: 100 }
+        ]
+      }
+    };
+
+    let currentMatch = "stuttgart";
+    let currentVideoType = "combined";
+
+    function renderLeaderboard(data) {
+      const tbody = document.getElementById("leaderboard-tbody");
+      tbody.innerHTML = "";
+      data.forEach(item => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${item.id}</td>
+          <td><span class="team-badge ${item.badgeClass}">${item.team}</span></td>
+          <td>${item.dist}</td>
+          <td>${item.avg}</td>
+          <td>
+            <div class="speed-bar-wrap">
+              <span>${item.top}</span>
+              <div class="speed-bar"><div class="speed-fill" style="width: ${item.pct}%;"></div></div>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function selectMatch(matchKey) {
+      currentMatch = matchKey;
+      const data = matchData[matchKey];
+      if (!data) return;
+
+      document.querySelectorAll(".match-select-btn").forEach(btn => btn.classList.remove("active"));
+      const activeBtn = document.getElementById(`btn-match-${matchKey}`);
+      if (activeBtn) activeBtn.classList.add("active");
+
+      // Update Header & KPIs
+      document.getElementById("video-section-title").textContent = data.title;
+      document.getElementById("val-tracks").textContent = data.tracks;
+      document.getElementById("sub-tracks").textContent = data.subTracks;
+      document.getElementById("val-control").textContent = data.control;
+      document.getElementById("sub-control").textContent = data.subControl;
+      document.getElementById("val-speed").innerHTML = `${data.speed} <span style="font-size: 18px; font-weight: 500;">km/h</span>`;
+      document.getElementById("sub-speed").textContent = data.subSpeed;
+
+      // Update Possession Breakdown
+      const posA = parseFloat(data.posA) || 0;
+      const posB = parseFloat(data.posB) || 0;
+      document.getElementById("pos-team-a-label").innerHTML = `${data.teamA}: <strong>${data.posA}</strong>`;
+      document.getElementById("pos-team-b-label").innerHTML = `<strong>${data.posB}</strong> :${data.teamB}`;
+      document.getElementById("pos-bar-a").style.width = `${posA}%`;
+      document.getElementById("pos-bar-b").style.width = `${posB}%`;
+
+      document.getElementById("stat-passes-val").textContent = data.passesCompleted || "10";
+      document.getElementById("stat-width-val").textContent = data.tacticalWidth || "60.0 m";
+      document.getElementById("stat-depth-val").textContent = data.tacticalDepth || "65.0 m";
+      document.getElementById("stat-lineup-val").textContent = data.activeLineup || "11 players";
+
+      // Update Passing Network Buttons
+      const btnA = document.getElementById("btn-pass-a");
+      const btnB = document.getElementById("btn-pass-b");
+      btnA.textContent = data.teamA;
+      btnB.textContent = data.teamB;
+      btnA.classList.remove("active");
+      btnB.classList.add("active"); // default to active passing team
+      document.getElementById("pass-img").src = data.passImages.teamB;
+
+      // Render Leaderboard
+      renderLeaderboard(data.leaderboard);
+
+      // Load Video
+      switchVideo(currentVideoType);
+    }
+
+    function switchVideo(type) {
+      currentVideoType = type;
+      const player = document.getElementById("main-video-player");
+      const source = document.getElementById("video-source");
+
+      document.querySelectorAll(".video-tab-btn").forEach(btn => btn.classList.remove("active"));
+      document.getElementById(`btn-tab-${type}`).classList.add("active");
+
+      const match = matchData[currentMatch];
+      if (match && match.videos[type]) {
+        source.src = match.videos[type];
+        player.load();
+        player.play().catch(e => console.log("Autoplay notice:", e));
+      }
+    }
+
+    function switchPass(teamKey) {
+      const match = matchData[currentMatch];
+      const img = document.getElementById("pass-img");
+      const btnA = document.getElementById("btn-pass-a");
+      const btnB = document.getElementById("btn-pass-b");
+
+      if (teamKey === "Team A") {
+        img.src = match.passImages.teamA;
+        btnA.classList.add("active");
+        btnB.classList.remove("active");
+      } else {
+        img.src = match.passImages.teamB;
+        btnB.classList.add("active");
+        btnA.classList.remove("active");
+      }
+    }
+
+    // Modal Handling
+    function openAnalyzeModal() {
+      document.getElementById("modal-analyze").classList.add("active");
+    }
+    function closeAnalyzeModal() {
+      document.getElementById("modal-analyze").classList.remove("active");
+    }
+    function handleModalOverlayClick(e) {
+      if (e.target.id === "modal-analyze") {
+        closeAnalyzeModal();
+      }
+    }
+
+    async function submitAnalysis(e) {
+      e.preventDefault();
+      const videoPath = document.getElementById("input-video-path").value;
+      const teamA = document.getElementById("input-team-a").value;
+      const teamACol = document.getElementById("input-team-a-col").value;
+      const teamB = document.getElementById("input-team-b").value;
+      const teamBCol = document.getElementById("input-team-b-col").value;
+      const maxFrames = document.getElementById("input-max-frames").value;
+
+      const submitBtn = document.getElementById("btn-submit-analyze");
+      const statusBox = document.getElementById("analyze-status-box");
+      const statusText = document.getElementById("analyze-status-text");
+      const terminalLog = document.getElementById("analyze-terminal-log");
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Analyzing...";
+      statusBox.style.display = "block";
+      statusText.textContent = "Connecting to pipeline...";
+
+      try {
+        const res = await fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            video_path: videoPath,
+            team_a: teamA,
+            team_b: teamB,
+            team_a_color: teamACol,
+            team_b_color: teamBCol,
+            max_frames: maxFrames ? parseInt(maxFrames) : null
+          })
+        });
+
+        if (res.ok) {
+          // Poll status
+          const interval = setInterval(async () => {
+            const stRes = await fetch("/api/status");
+            if (stRes.ok) {
+              const statusData = await stRes.json();
+              statusText.textContent = statusData.progress;
+              terminalLog.textContent = statusData.log.slice(-1500);
+              terminalLog.scrollTop = terminalLog.scrollHeight;
+
+              if (!statusData.running) {
+                clearInterval(interval);
+                submitBtn.disabled = false;
+                submitBtn.textContent = "⚡ Run Tactical AI Analysis";
+                setTimeout(() => {
+                  window.location.reload();
+                }, 1500);
+              }
+            }
+          }, 1500);
+        } else {
+          const err = await res.json();
+          statusText.textContent = "Error: " + (err.error || "Failed to start");
+          submitBtn.disabled = false;
+        }
+      } catch (err) {
+        statusText.textContent = "Server notice: Run via CLI with: python analyze.py " + videoPath;
+        submitBtn.disabled = false;
+        submitBtn.textContent = "⚡ Run Tactical AI Analysis";
+      }
+    }
+
+    async function loadDynamicMatches() {
+      try {
+        const res = await fetch("/api/matches");
+        if (res.ok) {
+          const list = await res.json();
+          if (Array.isArray(list) && list.length > 0) {
+            const bar = document.getElementById("match-selector-bar");
+            list.forEach(m => {
+              const key = m.id.includes("gladbach") ? "gladbach" : (m.id.includes("stuttgart") ? "stuttgart" : m.id);
+              if (!matchData[key]) {
+                matchData[key] = {
+                  title: `🎬 ${m.name} · Tactical Footage`,
+                  tracks: String(m.total_tracks || 80),
+                  subTracks: "ByteTrack Stability: 100%",
+                  control: "50.0%",
+                  subControl: `${m.team_a} vs ${m.team_b}`,
+                  speed: "35.0",
+                  subSpeed: "Top Player Speed",
+                  teamA: m.team_a,
+                  teamB: m.team_b,
+                  posA: `${m.possession ? m.possession[m.team_a] || 50 : 50}%`,
+                  posB: `${m.possession ? m.possession[m.team_b] || 50 : 50}%`,
+                  passesCompleted: `${m.total_passes || 0} passes`,
+                  tacticalWidth: `${m.tactical_metrics && m.tactical_metrics[m.team_a] ? m.tactical_metrics[m.team_a].team_width_m : 60} m`,
+                  tacticalDepth: `${m.tactical_metrics && m.tactical_metrics[m.team_a] ? m.tactical_metrics[m.team_a].team_depth_m : 65} m`,
+                  activeLineup: "11 players",
+                  videos: m.videos,
+                  passImages: m.pass_images,
+                  leaderboard: matchData.stuttgart.leaderboard
+                };
+
+                const btn = document.createElement("button");
+                btn.className = "match-select-btn";
+                btn.id = `btn-match-${key}`;
+                btn.onclick = () => selectMatch(key);
+                btn.innerHTML = `
+                  <div class="match-icon">⚽</div>
+                  <div class="match-info">
+                    <h3>${m.name}</h3>
+                    <p>${m.duration_sec || 20}s · ${m.frames || 500} Frames</p>
+                  </div>
+                `;
+                bar.appendChild(btn);
+              }
+            });
+          }
+        }
+      } catch (e) {
+        console.log("Static/offline mode:", e);
+      }
+    }
+
+    // Initialize with Stuttgart
+    selectMatch("stuttgart");
+    loadDynamicMatches();
+  </script>
+</body>
+</html>

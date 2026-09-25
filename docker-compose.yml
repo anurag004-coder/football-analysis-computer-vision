@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  football-analytics:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: football-analytics-cv:latest
+    container_name: football_cv_dashboard
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./outputs:/app/outputs
+      - ./data/samples:/app/data/samples
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PORT=8000
+    # Optional GPU support (uncomment if NVIDIA Container Toolkit is installed)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]

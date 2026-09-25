@@ -1,0 +1,86 @@
+[
+  {
+    "id": "vfb_stuttgart_vs_greuther_furth",
+    "name": "VfB Stuttgart vs. Greuther Furth",
+    "team_a": "VfB Stuttgart",
+    "team_b": "Greuther Furth",
+    "team_a_color": "#DC143C",
+    "team_b_color": "#F0F0F0",
+    "frames": 499,
+    "fps": 25.0,
+    "duration_sec": 20.0,
+    "possession": {
+      "VfB Stuttgart": 0.0,
+      "Greuther Furth": 100.0
+    },
+    "total_passes": 10,
+    "tactical_metrics": {
+      "VfB Stuttgart": {
+        "team_width_m": 56.8,
+        "team_depth_m": 52.7,
+        "total_passes": 0,
+        "active_players": 8
+      },
+      "Greuther Furth": {
+        "team_width_m": 63.9,
+        "team_depth_m": 70.7,
+        "total_passes": 10,
+        "active_players": 83
+      }
+    },
+    "total_tracks": 188,
+    "videos": {
+      "combined": "outputs/vfb_stuttgart_vs_greuther_furth/sample_match_combined_web.mp4",
+      "annotated": "outputs/vfb_stuttgart_vs_greuther_furth/sample_match_annotated_web.mp4",
+      "tactical": "outputs/vfb_stuttgart_vs_greuther_furth/sample_match_tactical_map_web.mp4"
+    },
+    "pass_images": {
+      "team_a": "outputs/vfb_stuttgart_vs_greuther_furth/sample_match_passing_network_vfb_stuttgart.png",
+      "team_b": "outputs/vfb_stuttgart_vs_greuther_furth/sample_match_passing_network_greuther_furth.png"
+    },
+    "report_json": "outputs/vfb_stuttgart_vs_greuther_furth/sample_match_analysis_report.json",
+    "physical_csv": "outputs/vfb_stuttgart_vs_greuther_furth/sample_match_player_physical_metrics.csv"
+  },
+  {
+    "id": "borussia_mgladbach_vs_vfl_wolfsburg",
+    "name": "Borussia Mgladbach vs. VfL Wolfsburg",
+    "team_a": "Borussia Mgladbach",
+    "team_b": "VfL Wolfsburg",
+    "team_a_color": "#FFFFFF",
+    "team_b_color": "#44FF22",
+    "frames": 499,
+    "fps": 25.0,
+    "duration_sec": 20.0,
+    "possession": {
+      "Borussia Mgladbach": 90.3,
+      "VfL Wolfsburg": 9.7
+    },
+    "total_passes": 8,
+    "tactical_metrics": {
+      "Borussia Mgladbach": {
+        "team_width_m": 79.0,
+        "team_depth_m": 82.8,
+        "total_passes": 8,
+        "active_players": 46
+      },
+      "VfL Wolfsburg": {
+        "team_width_m": 35.1,
+        "team_depth_m": 55.1,
+        "total_passes": 0,
+        "active_players": 9
+      }
+    },
+    "total_tracks": 83,
+    "videos": {
+      "combined": "outputs/borussia_mgladbach_vs_vfl_wolfsburg/gladbach_vs_wolfsburg_extended_combined_web.mp4",
+      "annotated": "outputs/borussia_mgladbach_vs_vfl_wolfsburg/gladbach_vs_wolfsburg_extended_annotated_web.mp4",
+      "tactical": "outputs/borussia_mgladbach_vs_vfl_wolfsburg/gladbach_vs_wolfsburg_extended_tactical_map_web.mp4"
+    },
+    "pass_images": {
+      "team_a": "outputs/borussia_mgladbach_vs_vfl_wolfsburg/gladbach_vs_wolfsburg_extended_passing_network_borussia_mgladbach.png",
+      "team_b": "outputs/borussia_mgladbach_vs_vfl_wolfsburg/gladbach_vs_wolfsburg_extended_passing_network_vfl_wolfsburg.png"
+    },
+    "report_json": "outputs/borussia_mgladbach_vs_vfl_wolfsburg/gladbach_vs_wolfsburg_extended_analysis_report.json",
+    "physical_csv": "outputs/borussia_mgladbach_vs_vfl_wolfsburg/gladbach_vs_wolfsburg_extended_player_physical_metrics.csv"
+  }
+]

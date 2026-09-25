@@ -1,0 +1,38 @@
+{
+  "input_video": "data\\samples\\sample_match.mp4",
+  "total_frames_processed": 499,
+  "fps": 25.0,
+  "processing_time_sec": 220.44,
+  "id_switch_rate_percent": 0.0,
+  "total_unique_tracks": 188,
+  "id_switches_count": 0,
+  "possession_percentages": {
+    "VfB Stuttgart": 0.0,
+    "Greuther Furth": 100.0
+  },
+  "total_passes_detected": 10,
+  "tactical_metrics": {
+    "VfB Stuttgart": {
+      "team_width_m": 56.8,
+      "team_depth_m": 52.7,
+      "total_passes": 0,
+      "active_players": 8
+    },
+    "Greuther Furth": {
+      "team_width_m": 63.9,
+      "team_depth_m": 70.7,
+      "total_passes": 10,
+      "active_players": 83
+    }
+  },
+  "outputs": {
+    "annotated_video": "outputs\\vfb_stuttgart_vs_greuther_furth\\sample_match_annotated.mp4",
+    "tactical_map_video": "outputs\\vfb_stuttgart_vs_greuther_furth\\sample_match_tactical_map.mp4",
+    "combined_video": "outputs\\vfb_stuttgart_vs_greuther_furth\\sample_match_combined.mp4",
+    "tracking_csv": "outputs\\vfb_stuttgart_vs_greuther_furth\\sample_match_tracking_data.csv",
+    "tracking_parquet": "outputs\\vfb_stuttgart_vs_greuther_furth\\sample_match_tracking_data.parquet",
+    "physical_metrics_csv": "outputs\\vfb_stuttgart_vs_greuther_furth\\sample_match_player_physical_metrics.csv",
+    "passing_network_team_a": "outputs\\vfb_stuttgart_vs_greuther_furth\\sample_match_passing_network_vfb_stuttgart.png",
+    "passing_network_team_b": "outputs\\vfb_stuttgart_vs_greuther_furth\\sample_match_passing_network_greuther_furth.png"
+  }
+}

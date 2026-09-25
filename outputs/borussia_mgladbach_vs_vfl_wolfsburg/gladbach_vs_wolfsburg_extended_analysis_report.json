@@ -1,0 +1,38 @@
+{
+  "input_video": "data\\samples\\gladbach_vs_wolfsburg_extended.mp4",
+  "total_frames_processed": 499,
+  "fps": 25.0,
+  "processing_time_sec": 230.17,
+  "id_switch_rate_percent": 0.0,
+  "total_unique_tracks": 83,
+  "id_switches_count": 0,
+  "possession_percentages": {
+    "Borussia Mgladbach": 90.3,
+    "VfL Wolfsburg": 9.7
+  },
+  "total_passes_detected": 8,
+  "tactical_metrics": {
+    "Borussia Mgladbach": {
+      "team_width_m": 79.0,
+      "team_depth_m": 82.8,
+      "total_passes": 8,
+      "active_players": 46
+    },
+    "VfL Wolfsburg": {
+      "team_width_m": 35.1,
+      "team_depth_m": 55.1,
+      "total_passes": 0,
+      "active_players": 9
+    }
+  },
+  "outputs": {
+    "annotated_video": "outputs\\borussia_mgladbach_vs_vfl_wolfsburg\\gladbach_vs_wolfsburg_extended_annotated.mp4",
+    "tactical_map_video": "outputs\\borussia_mgladbach_vs_vfl_wolfsburg\\gladbach_vs_wolfsburg_extended_tactical_map.mp4",
+    "combined_video": "outputs\\borussia_mgladbach_vs_vfl_wolfsburg\\gladbach_vs_wolfsburg_extended_combined.mp4",
+    "tracking_csv": "outputs\\borussia_mgladbach_vs_vfl_wolfsburg\\gladbach_vs_wolfsburg_extended_tracking_data.csv",
+    "tracking_parquet": "outputs\\borussia_mgladbach_vs_vfl_wolfsburg\\gladbach_vs_wolfsburg_extended_tracking_data.parquet",
+    "physical_metrics_csv": "outputs\\borussia_mgladbach_vs_vfl_wolfsburg\\gladbach_vs_wolfsburg_extended_player_physical_metrics.csv",
+    "passing_network_team_a": "outputs\\borussia_mgladbach_vs_vfl_wolfsburg\\gladbach_vs_wolfsburg_extended_passing_network_borussia_mgladbach.png",
+    "passing_network_team_b": "outputs\\borussia_mgladbach_vs_vfl_wolfsburg\\gladbach_vs_wolfsburg_extended_passing_network_vfl_wolfsburg.png"
+  }
+}

@@ -1,0 +1,132 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}</style><style>:root{color-scheme:light dark;--md-bg:#fff;--md-text:rgba(0,0,0,.8);--md-muted:rgba(0,0,0,.6);--md-fill:rgba(0,0,0,.04);--md-fill-strong:rgba(0,0,0,.06);--md-rule:rgba(0,0,0,.1);--md-rule-strong:rgba(0,0,0,.16);--md-link:hsl(210 100% 45%)}@media (prefers-color-scheme:dark){:root:where(:not([data-theme="light"])){--md-bg:#0d0d0d;--md-text:rgba(255,255,255,.85);--md-muted:rgba(255,255,255,.6);--md-fill:rgba(255,255,255,.06);--md-fill-strong:rgba(255,255,255,.09);--md-rule:rgba(255,255,255,.14);--md-rule-strong:rgba(255,255,255,.22);--md-link:hsl(210 100% 72%)}}:root[data-theme="dark"]{color-scheme:dark;--md-bg:#0d0d0d;--md-text:rgba(255,255,255,.85);--md-muted:rgba(255,255,255,.6);--md-fill:rgba(255,255,255,.06);--md-fill-strong:rgba(255,255,255,.09);--md-rule:rgba(255,255,255,.14);--md-rule-strong:rgba(255,255,255,.22);--md-link:hsl(210 100% 72%)}:root[data-theme="light"]{color-scheme:light}@media print{:root,:root[data-theme="dark"]{color-scheme:light;--md-bg:#fff;--md-text:rgba(0,0,0,.8);--md-muted:rgba(0,0,0,.6);--md-fill:rgba(0,0,0,.04);--md-fill-strong:rgba(0,0,0,.06);--md-rule:rgba(0,0,0,.1);--md-rule-strong:rgba(0,0,0,.16);--md-link:hsl(210 100% 45%)}}body{background:var(--md-bg);color:var(--md-text);max-width:720px;margin:0 auto;padding:32px;display:flex;flex-direction:column;gap:10px;font:14px/1.55 -apple-system,BlinkMacSystemFont,'SF Pro','Segoe UI',sans-serif;overflow-wrap:break-word}body>:first-child{margin-top:0}h1,h2,h3,h4,h5,h6{margin:6px 0 0;line-height:1.25;font-weight:600;text-wrap:balance}h1{font-size:1.35em}h2{font-size:1.15em;color:var(--md-muted)}h3,h4,h5,h6{font-size:1em}p,ul,ol,blockquote,table,pre,hr{margin:0}strong{font-weight:600}a{color:var(--md-link);text-decoration:none}a:hover{text-decoration:underline}ul,ol{display:flex;flex-direction:column;gap:6px;padding-left:22px}ul{list-style:disc}ol{list-style:decimal}:is(li,td,th)>*+:is(p,ul,ol,blockquote){margin-top:6px}blockquote{display:flex;flex-direction:column;gap:10px;border-left:2px solid var(--md-rule);padding-left:10px;color:var(--md-muted)}:not(pre)>code{background:var(--md-fill);padding:1px 3px;border-radius:4px;font:.92em 'SF Mono',ui-monospace,Menlo,Consolas,monospace}a>code{background:none;color:inherit}pre{background:var(--md-fill);padding:10px 12px;border-radius:6px;overflow-x:auto;font:12px/1.5 'SF Mono',ui-monospace,Menlo,Consolas,monospace;margin-block:4px}pre code{background:none;padding:0;font:inherit}table{width:100%;border-collapse:separate;border-spacing:2px;font:inherit}th,td{padding:6px 8px;border-radius:3px;text-align:left;vertical-align:top}th{background:var(--md-fill-strong);font-weight:600}td{background:var(--md-fill)}:is(th,td) :not(pre)>code{background:transparent}hr{border:0;border-top:1px solid var(--md-rule-strong);margin-block:10px}img{max-width:100%;height:auto;border-radius:4px}</style>
+</head><body>
+<h1>PRD: Football Analytics Computer Vision Pipeline</h1>
+<p><strong>Build target:</strong> Google Antigravity (agent-driven implementation)
+<strong>Owner:</strong> [Your name] · <strong>Status:</strong> Draft v1 · <strong>Date:</strong> 2026-09-25</p>
+<h2>1. Problem &amp; Goal</h2>
+<p>Turn raw broadcast football footage into tactical insight (positions, speeds, passing networks, space control) without manual annotation. Antigravity agents write, run, debug, and iterate on the pipeline; the human defines scope and reviews artifacts.</p>
+<h2>2. Success Criteria</h2>
+<ul>
+<li>Input: single MP4 clip (broadcast angle) → Output: annotated MP4 + structured tracking data (CSV/Parquet) + 2D tactical map video.</li>
+<li>Player/ball detection mAP ≥ 0.8 on validation clips; ID switches &lt; 5% of tracks over a 2-min clip.</li>
+<li>Team classification accuracy ≥ 90% on clear-jersey frames.</li>
+<li>Homography reprojection error &lt; 3 pixels on labeled pitch keypoints.</li>
+<li>End-to-end run on a 2-minute 1080p clip completes on target GPU in &lt; 15 min.</li>
+</ul>
+<h2>3. Non-Goals (v1)</h2>
+<ul>
+<li>Multi-camera fusion, live/streaming inference, referee-decision detection, event/action recognition (passes, shots) beyond basic heuristics.</li>
+</ul>
+<h2>4. Data Sourcing &amp; Rights</h2>
+<p>Candidate test footage: 2026 FIFA World Cup and 2025/26 UEFA Champions League broadcasts, since they offer high-quality fixed/slow-panning camera angles well suited to this pipeline.</p>
+<p><strong>Important — this is not a copyright clearance.</strong> Broadcast footage of both tournaments is copyrighted by FIFA/UEFA and their licensed broadcasters. Using clips (even short ones, even for a personal/non-commercial analytics project) carries real infringement risk; there is no blanket &quot;no copyright issue&quot; status for this kind of footage, and Antigravity's agents should not be instructed to scrape or download broadcast streams. Recommended lower-risk options instead:</p>
+<ul>
+<li><strong>Open research datasets</strong> built for this exact use case, e.g. SoccerNet (tracking/detection clips released for research use under their own license terms — check current terms before use).</li>
+<li><strong>Footage you own or are licensed to use</strong> — e.g. your own recordings of matches you have rights to film, or clips obtained through an official API/licensing deal.</li>
+<li><strong>Synthetic or stand-in footage</strong> (amateur matches, simulated/rendered pitch scenes) for development and testing before pointing the pipeline at anything rights-sensitive.</li>
+</ul>
+<p>Treat this as an open item to resolve with actual licensing/legal review before sourcing any tournament broadcast footage; don't have the agent hardcode assumptions about rights clearance.</p>
+<h2>5. Pipeline Architecture</h2>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th>Process</th>
+<th>Tech</th>
+<th>Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Detection</td>
+<td>Detect players, refs, ball per frame</td>
+<td>YOLOv11 (PyTorch)</td>
+<td>Bounding boxes + confidence per frame</td>
+</tr>
+<tr>
+<td>Tracking</td>
+<td>Persistent IDs across frames, handle occlusion</td>
+<td>ByteTrack</td>
+<td>Track IDs linked to detections</td>
+</tr>
+<tr>
+<td>Classification</td>
+<td>Group into Team A / Team B / GK / Ref</td>
+<td>K-Means on jersey-crop dominant color (HSV)</td>
+<td>Team label per track</td>
+</tr>
+<tr>
+<td>Pitch Mapping</td>
+<td>Broadcast → top-down 2D map</td>
+<td>OpenCV homography from pitch keypoints</td>
+<td>(x, y) pitch coordinates per player/frame</td>
+</tr>
+<tr>
+<td>Analytics</td>
+<td>Positional data → metrics</td>
+<td>NumPy/SciPy</td>
+<td>Speed, distance, passing network, Voronoi space control</td>
+</tr>
+</tbody>
+</table>
+<h2>6. Repo Structure (agent should scaffold this)</h2>
+<pre><code>football-cv/
+  data/            # sample clips, keypoint annotations
+  src/
+    detect/        # YOLOv11 inference wrapper
+    track/         # ByteTrack integration
+    classify/      # jersey color clustering
+    pitch/         # homography + keypoint calibration
+    analytics/     # speed, Voronoi, passing network
+    pipeline.py    # orchestrates end-to-end run
+  outputs/         # annotated video, CSV/Parquet, tactical map video
+  tests/
+  requirements.txt
+  README.md
+</code></pre>
+<h2>7. Functional Requirements by Phase</h2>
+<p><strong>Detection</strong> — load YOLOv11 (pretrained or fine-tuned on football dataset), run per-frame inference, output boxes for player/ref/ball classes; configurable confidence threshold.
+<strong>Tracking</strong> — feed detections into ByteTrack, output stable track IDs; must recover IDs after short occlusions (&lt; 1s).
+<strong>Classification</strong> — crop each player box, extract dominant color via K-Means (k=2-3 to separate jersey/shorts/background), cluster tracks into 2 teams + GK by color distance; persist team label per track for the match (not per frame).
+<strong>Pitch Mapping</strong> — allow manual or semi-auto keypoint selection (corners, penalty box, center circle) on first frame; compute homography matrix with OpenCV; project all track centroids to pitch coordinates each frame.
+<strong>Analytics</strong> — from pitch-coordinate time series compute: instantaneous &amp; average speed per player, distance covered, Voronoi tessellation per frame for space control, and a passing network (heuristic: ball possession changes between tracks).</p>
+<h2>8. Antigravity Execution Plan</h2>
+<h3>7.1 Agent Manager kickoff prompt</h3>
+<blockquote>
+<p>&quot;Scaffold a Python repo per this structure. Build a pipeline using YOLOv11 and ByteTrack to detect and track football players/ball from an input MP4, output an annotated MP4 with bounding boxes and track IDs. Use requirements.txt with pinned versions. Include a CLI: <code>python pipeline.py --input clip.mp4 --output outputs/</code>.&quot;</p>
+</blockquote>
+<h3>7.2 Parallel subagent split</h3>
+<ul>
+<li><strong>Subagent A (Detection+Tracking):</strong> YOLOv11 integration, ByteTrack wiring, occlusion handling, unit tests on a short clip.</li>
+<li><strong>Subagent B (Classification+Pitch):</strong> K-Means jersey clustering, homography calibration tool (click-to-select keypoints), coordinate projection.</li>
+<li><strong>Subagent C (Analytics+Viz):</strong> Speed/distance calc, Voronoi diagrams, passing network graph, Matplotlib/OpenCV overlay for the 2D tactical map video.</li>
+</ul>
+<h3>7.3 Autonomous debugging expectations</h3>
+<p>Agents should read stack traces on failure (tensor shape mismatches, OpenCV index errors), patch the code, and re-run automatically; human reviews only final diffs and outputs, not every intermediate error.</p>
+<h3>7.4 Remote GPU execution</h3>
+<p>Use Antigravity Remote Control to run detection/tracking on a cloud GPU instance; keep classification/analytics (CPU-light) runnable locally for fast iteration. Artifacts (annotated video, CSV) sync back for local review.</p>
+<h2>9. Milestones</h2>
+<ol>
+<li><strong>M1 – Scaffold &amp; Detection:</strong> repo structure, YOLOv11 inference on sample clip, boxes drawn on output video.</li>
+<li><strong>M2 – Tracking:</strong> ByteTrack integrated, stable IDs, ID-switch rate measured.</li>
+<li><strong>M3 – Classification:</strong> team/GK labels assigned and validated visually.</li>
+<li><strong>M4 – Pitch Mapping:</strong> homography tool + projected 2D positions validated against known pitch dimensions.</li>
+<li><strong>M5 – Analytics:</strong> speed/distance/Voronoi/passing-network computed and visualized.</li>
+<li><strong>M6 – Integration:</strong> single CLI runs all phases end-to-end; performance benchmarked on target GPU.</li>
+</ol>
+<h2>10. Risks &amp; Mitigations</h2>
+<ul>
+<li><strong>Jersey color ambiguity (similar kits/lighting):</strong> fall back to manual team-color seed input.</li>
+<li><strong>Ball detection unreliability (small object):</strong> consider higher-res crop / dedicated ball-detection fine-tune.</li>
+<li><strong>Homography drift on moving broadcast camera:</strong> re-calibrate keypoints per camera cut, or restrict v1 to fixed/slowly-panning camera clips.</li>
+<li><strong>GPU cost/availability:</strong> cap clip length for dev iteration; batch longer runs.</li>
+</ul>
+<h2>11. Deliverables</h2>
+<ul>
+<li>Working repo (structure above) with README and pinned <code>requirements.txt</code>.</li>
+<li>Sample annotated MP4 + 2D tactical map video.</li>
+<li>CSV/Parquet of per-frame track positions, team labels, and computed metrics.</li>
+<li>Short write-up of accuracy/perf numbers against Section 2 success criteria.</li>
+</ul>
+
+</body></html>

@@ -1,0 +1,35 @@
+# Virtual Environment
+venv/
+env/
+.venv/
+ENV/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Operating System & IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.bak
+
+# YOLO Model Weights (auto-downloaded by Ultralytics on first run)
+*.pt
+
+# Large Raw Video Files (>100MB exceeds GitHub hard limit)
+data/samples/*.mp4
+!data/samples/sample_match_preview.mp4
+
+# Intermediate uncompressed OpenCV videos (use web-optimized H.264 files instead)
+outputs/*/*_annotated.mp4
+outputs/*/*_combined.mp4
+outputs/*/*_tactical_map.mp4
+!outputs/*/*_web.mp4
