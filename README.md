@@ -1,5 +1,6 @@
 # ⚽ Autonomous Football Computer Vision & Tactical Analytics Pipeline
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://football-analysis-computer-vision-eight.vercel.app/)
 [![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.4+-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)](https://pytorch.org/)
 [![YOLOv11](https://img.shields.io/badge/YOLOv11-Ultralytics-00FFFF?style=for-the-badge&logo=yolo&logoColor=black)](https://github.com/ultralytics/ultralytics)
@@ -8,6 +9,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
 > An end-to-end autonomous computer vision & spatial intelligence pipeline for broadcast football match footage. Transforms raw uncalibrated video into 2D metric pitch coordinates, continuous player physical telemetry, dynamic Voronoi space control partitions, graph-based passing networks, and an interactive glassmorphic web analytics dashboard.
+
+🚀 **Live Interactive Dashboard:** [https://football-analysis-computer-vision-eight.vercel.app/](https://football-analysis-computer-vision-eight.vercel.app/)
 
 ---
 
@@ -239,46 +242,24 @@ tests/test_pipeline.py::test_full_synthetic_frame_integration PASSED
 
 ---
 
-## 🚀 Deployment Guide: Frontend Dashboard
+## 🌐 Live Production Dashboard
 
-The frontend dashboard can be deployed in two modes depending on your use case:
+The interactive tactical analytics dashboard is live and deployed on Vercel:
 
-### Mode A: Static Web Showcase (GitHub Pages / Vercel / Netlify)
-Ideal for sharing interactive match reports, pre-rendered videos, and passing networks with zero server costs.
+👉 **[https://football-analysis-computer-vision-eight.vercel.app/](https://football-analysis-computer-vision-eight.vercel.app/)**
 
-1. **Deploying to GitHub Pages:**
-   - Go to your repository settings on GitHub: **Settings > Pages**.
-   - Under **Build and deployment > Source**, select **Deploy from a branch**.
-   - Select branch **`main`** and folder **`/ (root)`**.
-   - Click **Save**. Within 1–2 minutes, your dashboard is live at `https://anurag004-coder.github.io/football-analysis-computer-vision/dashboard.html`!
+### Dashboard Features
+- **Multi-Match Switching:** Seamlessly toggle between analyzed Bundesliga fixtures (*VfB Stuttgart vs. Greuther Fürth*, *Borussia Mönchengladbach vs. VfL Wolfsburg*).
+- **Synchronized Tri-View Playback:** Dual-view combined broadcast, 2D tactical pitch radar, and AI-annotated video streams with full scrubber controls.
+- **Dynamic Passing Networks:** Tactical formation centroids with weighted directed passing arrows.
+- **Live Possession & Space Dominance:** Real-time possession percentages, team width, and depth metrics.
+- **Physical Performance Telemetry:** Top match speeds, distance covered, and sprint counts.
 
-2. **Deploying to Vercel:**
-   ```bash
-   npm install -g vercel
-   vercel --prod
-   ```
-   *(Vercel automatically serves `dashboard.html`, `matches.json`, and the assets in `outputs/`).*
-
----
-
-### Mode B: Full-Stack Cloud Deployment with Docker (Render / Railway / AWS EC2)
-Ideal for production setups where users can upload new MP4 match videos and run GPU/CPU computer vision inference dynamically via the REST API.
-
-#### 1. Local / Self-Hosted Docker Deployment
-Run the containerized application with a single command:
-
+### Optional: Self-Hosting Locally via Docker
 ```bash
-# Build and run container
 docker-compose up -d --build
 ```
-Access the dashboard at `http://localhost:8000/dashboard.html`.
-
-#### 2. Deploy to Render / Railway
-1. Fork or push this repository to your GitHub account.
-2. In [Render](https://render.com) or [Railway](https://railway.app), create a new **Web Service** connected to your repository.
-3. Select **Docker** as the runtime environment.
-4. Render/Railway will automatically detect the `Dockerfile`, build the image, and bind to the assigned port.
-5. Your full-stack dashboard and video processing API will be accessible globally!
+Access the local dashboard at `http://localhost:8000/dashboard.html`.
 
 ---
 
