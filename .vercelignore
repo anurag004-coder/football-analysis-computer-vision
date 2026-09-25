@@ -1,0 +1,9 @@
+# Tell Vercel to ignore Python backend manifests & source code
+# so it deploys purely as a high-speed static frontend showcase.
+requirements.txt
+*.py
+src/
+tests/
+Dockerfile
+docker-compose.yml
+Football CV Pipeline PRD.html
